@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Shared Dark Theme Variables --- */
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0f172a;      /* Slate-900 */
+            --card-bg: #1e293b;       /* Slate-800 */
+            --text-main: #f8fafc;     /* Slate-50 */
+            --text-muted: #94a3b8;    /* Slate-400 */
+            --border-color: #334155;  /* Slate-700 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* Ambient Background Glow (Indigo Themed) */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite alternate;
+        }
+        .shape-1 {
+            height: 300px; width: 300px;
+            background: var(--primary-color);
+            top: -50px; left: -50px;
+        }
+        .shape-2 {
+            height: 300px; width: 300px;
+            background: #4338ca; /* Darker Indigo */
+            bottom: -50px; right: -50px;
+        }
+
+        /* Card Styling */
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background-color: var(--card-bg); /* Solid Slate-800 */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Modern Animated Input --- */
+        .input-group-modern {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .input-group-modern input {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            color: var(--text-main);
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-group-modern input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        .input-group-modern .underline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 100%;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.4s ease-out;
+        }
+        .input-group-modern input:focus ~ .underline {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Button Styling */
+        .btn-glow {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        .btn-glow:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            color: white;
+        }
+
+        .text-muted-custom { color: var(--text-muted); }
+        
+        .hover-white:hover { color: white !important; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 50px); }
+        }
+        
+        /* Autofill Fix */
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--card-bg) inset !important;
+            -webkit-text-fill-color: var(--text-main) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="login-card">
+        <div class="text-center mb-5">
+            <div class="mb-3">
+                <i class="fas fa-user-shield fa-3x" style="color: var(--primary-color);"></i>
+            </div>
+            <h3 class="fw-bold tracking-wide">Admin Access</h3>
+            <p class="text-muted-custom small">Enter your credentials to continue</p>
+        </div>
+
+        <form action="/admin/login" method="post" onsubmit="return checkValidate()">
+            <div class="input-group-modern">
+                <input type="email" id="email" placeholder="Email address" name="email">
+                <span class="underline"></span>
+            </div>
+  
+            <div class="input-group-modern">
+                <input type="password" id="password" placeholder="Password" name="password">
+                <span class="underline"></span>
+            </div>
+            
+            <button type="submit" class="btn btn-glow w-100 rounded-pill mb-4">
+                Login Dashboard
+            </button>
+            
+            <div class="text-center">
+                <a href="/" class="text-decoration-none text-muted-custom small hover-white">
+                    &larr; Back to Website
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <% if (typeof msg !== 'undefined') { %>
+        <script>
+            Swal.fire({
+                title: "<%=msg%>",
+                text: "That thing is still around?",
+                icon: "<%=icon%>",
+                background:'#0F172A',
+                color: '#DADACE',
+            });
+            
+            const url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({path: url}, '', url);
+
+        </script>
+    <% } %>
+    <script>
+        function checkValidate(){
+            const email = document.getElementById('email').value
+            const password = document.getElementById('password').value
+            
+            
+            if(email==""){
+                Swal.fire({
+                    title: "Empty Email",
+                    text: "That thing is still around?",
+                    icon: "question"
+                });
+                return false
+            }else if(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/.test(email)){
+                Swal.fire({
+                    title: "Invalid Email",
+                    text: "That thing is still around?",
+                    icon: "question"
+                });
+                return false
+            }else if(password==""){
+                Swal.fire({
+                    title: "Empty Password",
+                    text: "That thing is still around?",
+                    icon: "question"
+                });
+                return false
+            }else{
+                return true
+            }
+        }
+    </script>
+
+</body>
+</html>

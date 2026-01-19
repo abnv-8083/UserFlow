@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- Shared Dark Theme Variables --- */
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0f172a;      /* Slate-900 (Main BG) */
+            --card-bg: #1e293b;       /* Slate-800 (Sidebar/Card) */
+            --text-main: #f8fafc;     /* Slate-50 */
+            --text-muted: #94a3b8;    /* Slate-400 */
+            --border-color: #334155;  /* Slate-700 */
+        }
+
+        body { 
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar { 
+            height: 100vh; 
+            background: var(--card-bg); 
+            color: white;
+            position: fixed; 
+            width: 250px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .nav-link { color: var(--text-muted); transition: 0.2s; }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.05); }
+        .nav-link.active { background-color: var(--primary-color) !important; color: white !important; }
+
+        /* --- Main Content --- */
+        .main-content { margin-left: 250px; padding: 30px; }
+
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+        }
+        .btn-primary-custom:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        /* --- Table Card --- */
+        .table-container { 
+            background: var(--card-bg); 
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+            overflow: hidden; 
+            border: 1px solid var(--border-color);
+        }
+
+        /* Search Input */
+        .search-input {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        .search-input:focus {
+            background-color: var(--bg-color);
+            border-color: var(--primary-color);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        /* Table Styling */
+        .table { --bs-table-bg: transparent; --bs-table-color: var(--text-main); margin-bottom: 0; }
+        
+        .table thead th { 
+            background-color: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--border-color); 
+            color: var(--text-muted); 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            padding: 15px;
+        }
+
+        .table td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); }
+        .text-muted-custom { color: var(--text-muted) !important; }
+
+        /* --- Action Buttons (Dark Mode Optimized) --- */
+        .btn-action { 
+            width: 35px; height: 35px; 
+            border-radius: 8px; 
+            display: inline-flex; align-items: center; justify-content: center; 
+            transition: 0.2s; border: none;
+        }
+        
+        .btn-edit { background-color: rgba(13, 110, 253, 0.15); color: #60a5fa; } /* Blue tint */
+        .btn-edit:hover { background-color: #0d6efd; color: white; }
+        
+        .btn-block { background-color: rgba(255, 193, 7, 0.15); color: #fcd34d; } /* Yellow tint */
+        .btn-block:hover { background-color: #ffc107; color: black; }
+        
+        .btn-delete { background-color: rgba(220, 53, 69, 0.15); color: #f87171; } /* Red tint */
+        .btn-delete:hover { background-color: #dc3545; color: white; }
+
+        /* Badges */
+        .badge-admin { background-color: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--border-color); }
+        .badge-active { background-color: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .badge-blocked { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+    </style>
+</head>
+<body>
+
+<div class="sidebar d-flex flex-column p-3">
+    <h4 class="mb-5 mt-2 text-center fw-bold text-white">Admin<span style="color: var(--primary-color)">Panel</span></h4>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-2"><a href="#" class="nav-link active"><i class="fas fa-users me-3"></i> Users</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link"><i class="fas fa-chart-line me-3"></i> Analytics</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link"><i class="fas fa-cog me-3"></i> Settings</a></li>
+    </ul>
+    <a href="/admin/logout" class="btn btn-outline-secondary w-100 mt-auto border-0 text-start ps-3"><i class="fas fa-sign-out-alt me-3"></i> Logout</a>
+</div>
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">User Management</h2>
+            <p class="text-muted-custom">Manage system access and permissions</p>
+        </div>
+        <button class="btn btn-primary-custom rounded-pill px-4 py-2"><i class="fas fa-plus me-2"></i> Add User</button>
+    </div>
+
+    <div class="table-container p-4">
+        <div class="d-flex justify-content-between mb-4">
+            <form class="d-flex w-25" method="get" action="">
+                <input type="text" class="form-control rounded-pill search-input me-2" name="search" placeholder="Search users..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+                <input type="hidden" name="page" value="1">
+                <button class="btn btn-primary-custom rounded-pill px-3" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+                <!-- Edit User Modal -->
+                <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color);">
+                            <form id="editUserForm" method="post">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="id" id="editUserId">
+                                    <div class="mb-3">
+                                        <label for="editUserName" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="editUserName" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editUserEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="editUserEmail" name="email" required>
+                                    </div>
+                                    
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary-custom">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (currUser.length <= 0){ %>
+                    <span colspan="4">Empty Users</span>
+                <% }else{ %>
+                    <% currUser.forEach(user => {%>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="https://ui-avatars.com/api/?name=<%=user.name %>&background=6366f1&color=fff" class="avatar me-3">
+                                    <div>
+                                        <div class="fw-bold text-white"><%= user.name %></div>
+                                        <div class="text-muted-custom small">ID: <%= user._id %></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted-custom"><%= user.email %></td>
+                            <% if(user.status == 1) {%>
+                                <td><span class="badge badge-active px-3 py-2 rounded-pill">Active</span></td>
+                            <% }else{ %>
+                                <td><span class="badge badge-blocked px-3 py-2 rounded-pill">Block</span></td>
+                            <% } %>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end align-items-center">
+                                                                <button class="btn-action btn-edit me-1 editUserBtn" 
+                                                                    title="Edit"
+                                                                    data-id="<%= user._id %>"
+                                                                    data-name="<%= user.name %>"
+                                                                    data-email="<%= user.email %>"
+                                                                    data-status="<%= user.status %>">
+                                                                    <i class="fas fa-pen"></i>
+                                                                </button>
+                                <% if(user.status == 1) {%>
+                                    <form action="/admin/block/<%= user._id %>" method="post" class="blockForm">
+                                        <button class="btn-action btn-block me-1" title="Block"><i class="fas fa-ban"></i></button>
+                                    </form>
+                                <% }else{ %>
+                                    <form action="/admin/unblock/<%= user._id %>" method="post" class="unblockForm">
+                                        <button class="btn-action btn-block me-1" title="Unblock"><i class="fas fa-unlock"></i></button>
+                                    </form>
+                                <% } %>
+                                    <form action="/admin/delete/<%= user._id %>" method="post" class="deleteForm">
+                                        <button class="btn-action btn-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } %>
+            </tbody>
+                </table>
+
+                <!-- Pagination Controls -->
+                <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+                <nav aria-label="User pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+                            <a class="page-link" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color);" href="?search=<%= encodeURIComponent(search || '') %>&page=<%= page - 1 %>&limit=<%= limit %>" tabindex="-1">Previous</a>
+                        </li>
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= page === i ? 'active' : '' %>">
+                                <a class="page-link" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color);" href="?search=<%= encodeURIComponent(search || '') %>&page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color);" href="?search=<%= encodeURIComponent(search || '') %>&page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+                <% } %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Query Path params -->
+    <% if (typeof msg !== 'undefined') { %>
+        <script>
+            Swal.fire({
+                title: "<%=msg%>",
+                text: "That thing is still around?",
+                icon: "<%=icon%>",
+                background:'#0F172A',
+                color: '#DADACE',
+            });
+            
+            const url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({path: url}, '', url);
+            
+        </script>
+    <% } %>
+
+    <script>
+        // Block Confirm
+        const blockForm = document.querySelectorAll('.blockForm')
+        blockForm.forEach(form=>{
+            form.addEventListener('submit',function(e){
+                e.preventDefault()
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "",
+                    icon: "warning",
+                    background:'#0F172A',
+                    color: '#DADACE',
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Block it!"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+                });
+            })
+        })
+        
+        // Unblock Confirm
+        const unblockForm = document.querySelectorAll('.unblockForm')
+        unblockForm.forEach(form=>{
+            form.addEventListener('submit',function(e){
+                e.preventDefault()
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "",
+                    icon: "warning",
+                    background:'#0F172A',
+                    color: '#DADACE',
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Unblock it!"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+                });
+            })
+        })
+        
+        // Delete Confirm
+        const deleteForm = document.querySelectorAll('.deleteForm')
+        deleteForm.forEach(form=>{
+            form.addEventListener('submit',function(e){
+                e.preventDefault()
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "",
+                    icon: "warning",
+                    background:'#0F172A',
+                    color: '#DADACE',
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Delete it!"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+                });
+            })
+        })
+        
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Floating Edit Form Logic
+        const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        const editUserForm = document.getElementById('editUserForm');
+        document.querySelectorAll('.editUserBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('editUserId').value = this.dataset.id;
+                document.getElementById('editUserName').value = this.dataset.name;
+                document.getElementById('editUserEmail').value = this.dataset.email;
+                // Set form action dynamically
+                editUserForm.action = `/admin/edit`;
+                editUserModal.show();
+            });
+        });
+    </script>
+    
+
+</body>
+</html>
