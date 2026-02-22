@@ -1,85 +1,66 @@
-const User = require('../models/userModel')
-const bcrypt = require('bcrypt')
+const userService = require('../services/userService');
 
 module.exports.getUserLogin = (req, res) => {
     const msg = req.query.msg
     const icon = req.query.icon
-    res.render('user/login',{msg,icon});
+    userService.getUserLogin(res, msg, icon);
 }
 
 module.exports.getUserRegister = (req, res) => {
     const msg = req.query.msg
     const icon = req.query.icon
-    res.render('user/register',{msg,icon});
+    userService.getUserRegister(res, msg, icon);
 }
 
 module.exports.getHomePage = (req, res) => {
     const msg = req.query.msg
     const icon = req.query.icon
     const name = req.query.name
-    res.render('user/home',{msg,icon,name});
+    userService.getHomePage(res, msg, icon, name);
 }
 
 module.exports.userLogout = (req,res)=>{
-    req.session.destroy((error)=>{
-        if(error){
-            console.log(error)
-        }else{
-            res.redirect('/')
-        }
-    })
+    userService.userLogout(req,res);
 }
 
 
 module.exports.postRegister = async (req,res)=>{
     try {
-        let {name,email,password}=req.body
-        const userExist = await User.findOne({email:email})
-        
-        {
-            const hashPassword = await bcrypt.hash(password,10)
-            const user = new User({
-                name:name,
-                email:email,
-                password:hashPassword,
-                status:1,
-            })
-            await user.save()
-            res.redirect('/?msg=User Created Successfully&icon=success')
+        const result = await userService.registerUser(req.body);
+        if (result.status === 'success') {
+            res.redirect('/?msg=User Created Successfully&icon=success');
+        } else if (result.msg === 'User Already Exists') {
+            res.redirect('/register?msg=User Already Exists&icon=warning');
+        } else {
+            res.redirect('/register?msg=Server Error&icon=error');
         }
-        
     } catch (error) {
         console.log(error)
         res.redirect('/register?msg=Server Error&icon=error')
-        
     }
 }
 
 module.exports.postLogin = async (req,res)=>{
     try {
-        let{email,password}=req.body
-        
-        const checkUser = await User.findOne({email})
-        
-        if(checkUser){
-            const checkPass = await bcrypt.compare(password,checkUser.password)
-            if(checkPass){
-                if(checkUser.status == 1){
-                    req.session.user = checkUser._id
-                    res.redirect(`/home?msg=Sucessfuly Login&icon=success &name=${checkUser.name}`)
-                }
-                else{
-                    res.redirect('/?msg=Sorry Account is Blocked&icon=warning')
-                }
-            }
-            else{
-                res.redirect('/?msg=Incorrect Password &icon=error')
-            }
-        }else{
-            res.redirect('/?msg=User Not Exist &icon=error')
+        const { email, password } = req.body;
+        const result = await userService.loginUser(email, password);
+
+        if (result.status === 'success') {
+            req.session.user = result.userId;
+            res.redirect(`/home?msg=Sucessfuly Login&icon=success&name=${result.name}`);
+        } else {
+            res.redirect(`/?msg=${result.msg}&icon=error`);
         }
     } catch (error) {
         console.log(error)
         res.redirect('/?msg=Server Error&icon=error')
     }
+}
+
+module.exports.getviews = (req,res)=>{
+    userService.getviews(res)
+}
+
+module.exports.getNotFound = (req,res)=>{
+    userService.getNotFound(res)
 }
